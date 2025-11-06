@@ -1,122 +1,89 @@
-# MakerBit IR Receiver
+# **Interest Group Code \- IR Remote Extension**
 
-[![Build Status](https://travis-ci.org/1010Technologies/pxt-makerbit-ir-receiver.svg?branch=master)](https://travis-ci.org/1010Technologies/pxt-makerbit-ir-receiver)
+This is a MakeCode extension for the common infrared (IR) remote control included in many Elegoo and Arduino starter kits.
 
-MakeCode extension for Keyestudio Infrared Wireless Module Kit. The extension should also work with other with IR receivers and NEC compatible IR remotes.
+It has been customized for the "Interest Group Code" project to provide simple, easy-to-use blocks for 4th-grade students.
 
-## MakerBit Board
+## **Using the Extension**
 
-The MakerBit connects to the BBC micro:bit to provide easy connections to a wide variety of sensors, actuators and other components.
+This extension adds a new category to MakeCode called **"Interest Group Code"**.
 
-http://makerbit.com/
+### **connect IR receiver**
 
-| ![MakerBit](https://github.com/1010Technologies/pxt-makerbit/raw/master/MakerBit.png "MakerBit") | ![MakerBit+R](https://github.com/1010Technologies/pxt-makerbit/raw/master/MakerBit+R.png "MakerBit+R") |
-| :----------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------: |
-|                                            _MakerBit_                                            |                                   _MakerBit+R with motor controller_                                   |
+You must use this block in an on start block. It tells the micro:bit which pin your IR receiver is connected to (usually P0) and which remote you're using (NEC).
 
-# Documentation
+makerbit.connectIrReceiver(DigitalPin.P0, IrProtocol.NEC)
 
-## makerbit.connectIrReceiver
+## **How to Assign Actions to Buttons (like CH or EQ)**
 
-Connects to the IR receiver module at the specified pin and configures the IR protocol.
+You have two great ways to make buttons do things.
 
-```sig
-makerbit.connectIrReceiver(DigitalPin.P0, IrProtocol.Keyestudio)
-```
+### **Method 1: The Easy Way (Event Blocks)**
 
-### Parameters
+This is the simplest way and is perfect for most projects. Use the on IR button pressed block. You can drag as many of these as you want onto your screen.
 
-- `pin` - digital pin with an attached IR receiver
-- `protocol` - the IR protocol to be detected, for example IrProtocol.Keyestudio or IrProtocol.NEC
+This example shows how to make the EQ button show a "target" icon and the CH+ button show a "ghost" icon.
 
-## makerbit.onIrButton
-
-Do something when a specific button is pressed or released on the remote control.
-
-```sig
-makerbit.onIrButton(IrButton.Ok, IrButtonAction.Pressed, () => {})
-```
-
-### Parameters
-
-- `button` - the button to be checked
-- `action`- the trigger action
-- `handler` - body code to run when the event is raised
-
-## makerbit.irButton
-
-Returns the code of the IR button that was pressed last. Returns -1 (IrButton.Any) if no button has been pressed yet.
-
-```sig
-makerbit.irButton()
-```
-
-## makerbit.onIrDatagram
-
-Do something when a specific button is pressed or released on the remote control.
-
-```sig
-makerbit.onIrDatagram(() => {})
-```
-
-### Parameters
-
-- `handler` - body code to run when the event is raised
-
-## makerbit.irDatagram
-
-Returns the IR datagram as 32-bit hexadecimal string. The last received datagram is returned or "0x00000000" if no data has been received yet.
-
-```sig
-makerbit.irDatagram()
-```
-
-## makerbit.wasIrDataReceived
-
-Returns true if any IR data was received since the last call of this function. False otherwise.
-
-```sig
-makerbit.wasIrDataReceived();
-```
-
-## makerbit.irButtonCode
-
-Returns the command code of a specific IR button.
-
-```sig
-makerbit.irButtonCode(IrButton.Number_9)
-```
-
-### Parameters
-
-- `button` - the button
-
-## MakeCode Example
-
-```blocks
-makerbit.connectIrReceiver(DigitalPin.P0, IrProtocol.Keyestudio)
-
-makerbit.onIrButton(IrButton.Ok, IrButtonAction.Released, function () {
-    basic.showIcon(IconNames.SmallHeart)
+// Run this code when EQ is pressed  
+makerbit.onIrButton(IrButton.Eq, IrButtonAction.Pressed, function () {  
+    basic.showIcon(IconNames.Target)  
 })
 
-makerbit.onIrButton(IrButton.Ok, IrButtonAction.Pressed, function () {
-    basic.showIcon(IconNames.Heart)
+// Run this code when CH+ is pressed  
+makerbit.onIrButton(IrButton.ChPlus, IrButtonAction.Pressed, function () {  
+    basic.showIcon(IconNames.Ghost)  
 })
 
-basic.forever(function () {
-    if (makerbit.wasAnyIrButtonPressed()) {
-        basic.showNumber(makerbit.irButton())
-    }
+// Run this code when number 1 is pressed  
+makerbit.onIrButton(IrButton.Number\_1, IrButtonAction.Pressed, function () {  
+    basic.showNumber(1)  
 })
 
-```
+### **Method 2: The Advanced Way (IF Statements)**
 
-## License
+This method is for more advanced projects, like making a remote-controlled car where you need to check buttons inside a forever loop.
 
-Licensed under the MIT License (MIT). See LICENSE file for more details.
+For this, you use **two** blocks:
 
-## Supported targets
+1. last button pressed (code): This block *gets* the raw number code of the last button that was pressed.  
+2. code for button %button: This block *holds* the correct code for a button you choose from the dropdown.
 
-- for PXT/microbit
-- for PXT/calliope
+You use them together in an if block to check if they are equal.
+
+let last\_button\_code \= 0
+
+basic.forever(function () {  
+    // 1\. Get the code for the last button pressed  
+    last\_button\_code \= makerbit.lastButtonPressed\_code\_()  
+      
+    // 2\. Check if it's the code for EQ  
+    if (last\_button\_code \== makerbit.irButtonCode(IrButton.Eq)) {  
+        basic.showIcon(IconNames.Target)  
+      
+    // 3\. Check if it's the code for CH+  
+    } else if (last\_button\_code \== makerbit.irButtonCode(IrButton.ChPlus)) {  
+        basic.showIcon(IconNames.Ghost)  
+    }  
+})
+
+## **New Blocks for Your Project**
+
+### **last number pressed**
+
+This is a special block made just for your project\! It's a "getter" block that simply **returns the last number (0-9) that was pressed** on the remote.
+
+It's perfect for projects where you want students to enter a code, select a level, or choose an answer.
+
+let last\_number \= 0
+
+basic.forever(function () {  
+    // Get the number from the "backend"  
+    last\_number \= makerbit.irLastNumberPressed()  
+      
+    // Show it on the screen  
+    basic.showNumber(last\_number)  
+})
+
+## **License**
+
+Licensed under the MIT License (MIT).
