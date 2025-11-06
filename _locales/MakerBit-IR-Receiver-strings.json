@@ -28,6 +28,8 @@
   "makerbit.connectIrReceiver|block": "connect IR receiver at pin %pin and decode %protocol",
   "makerbit.irButtonCode|block": "code for button %button",
   "makerbit.irButton|block": "last button pressed (code)",
+  "makerbit.irButtonCode|block": "code for button %button",
+  "makerbit.irButtonName|block": "last button pressed (name)",
   "makerbit.irDatagram|block": "IR datagram",
   "makerbit.irLastNumberPressed|block": "last number pressed",
   "makerbit.onIrButton|block": "on IR button | %button | %action",
